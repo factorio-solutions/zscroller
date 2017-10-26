@@ -10109,7 +10109,6 @@ DOMScroller.prototype = {
       if (e.touches[0] && e.touches[0].target && e.touches[0].target.tagName.match(/input|textarea|select/i) || _this2.disabled) {
         return;
       }
-      e.preventDefault();
       _this2.clearScrollbarTimer();
       // reflow since the container may have changed
       _this2.reflow();
@@ -10121,7 +10120,7 @@ DOMScroller.prototype = {
         zooming = _options.zooming;
 
 
-    if (preventDefaultOnTouchMove) {
+    if (preventDefaultOnTouchMove !== false) {
       this.bindEvent(container, 'touchmove', function (e) {
         e.preventDefault();
         scroller.doTouchMove(e.touches, e.timeStamp, e.scale);
