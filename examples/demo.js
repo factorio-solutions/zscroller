@@ -9865,6 +9865,16 @@ try {
   // empty
 }
 
+var isWebView = typeof navigator !== 'undefined' && /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(navigator.userAgent);
+
+function iOSWebViewFix(e, touchendFn) {
+  // https://github.com/ant-design/ant-design-mobile/issues/573#issuecomment-339560829
+  // iOS UIWebView issue, It seems no problem in WKWebView
+  if (isWebView && e.changedTouches[0].clientY < 0) {
+    touchendFn(new Event('touchend') || e);
+  }
+}
+
 var willPreventDefault = supportsPassive ? { passive: false } : false;
 var willNotPreventDefault = supportsPassive ? { passive: true } : false;
 
@@ -10119,24 +10129,25 @@ DOMScroller.prototype = {
         preventDefaultOnTouchMove = _options.preventDefaultOnTouchMove,
         zooming = _options.zooming;
 
-
-    if (preventDefaultOnTouchMove !== false) {
-      this.bindEvent(container, 'touchmove', function (e) {
-        e.preventDefault();
-        scroller.doTouchMove(e.touches, e.timeStamp, e.scale);
-      }, willPreventDefault);
-    } else {
-      this.bindEvent(container, 'touchmove', function (e) {
-        scroller.doTouchMove(e.touches, e.timeStamp, e.scale);
-      }, willNotPreventDefault);
-    }
-
     var onTouchEnd = function onTouchEnd(e) {
       scroller.doTouchEnd(e.timeStamp);
       releaseLockTimer = setTimeout(function () {
         lockMouse = false;
       }, 300);
     };
+
+    if (preventDefaultOnTouchMove !== false) {
+      this.bindEvent(container, 'touchmove', function (e) {
+        e.preventDefault();
+        scroller.doTouchMove(e.touches, e.timeStamp, e.scale);
+        iOSWebViewFix(e, onTouchEnd);
+      }, willPreventDefault);
+    } else {
+      this.bindEvent(container, 'touchmove', function (e) {
+        scroller.doTouchMove(e.touches, e.timeStamp, e.scale);
+        iOSWebViewFix(e, onTouchEnd);
+      }, willNotPreventDefault);
+    }
 
     this.bindEvent(container, 'touchend', onTouchEnd, willNotPreventDefault);
     this.bindEvent(container, 'touchcancel', onTouchEnd, willNotPreventDefault);
