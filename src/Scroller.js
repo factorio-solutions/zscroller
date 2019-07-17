@@ -888,31 +888,13 @@ var members = {
 
       // Otherwise figure out whether we are switching into dragging mode now.
     } else {
-
-      var minimumTrackingForScroll = 3;
       var minimumTrackingForDrag = 5;
 
       var distanceX = Math.abs(currentTouchLeft - self.__initialTouchLeft);
       var distanceY = Math.abs(currentTouchTop - self.__initialTouchTop);
 
-      self.__enableScrollX = self.options.scrollingX && distanceX >= minimumTrackingForScroll;
-      self.__enableScrollY = self.options.scrollingY && distanceY >= minimumTrackingForScroll;
-
-      let radian;
-
-      if (self.options.locking && self.__enableScrollY) {
-        radian = radian || Math.atan2(distanceY, distanceX);
-        if (radian < Math.PI / 4) {
-          self.__enableScrollY = false;
-        }
-      }
-
-      if (self.options.locking && self.__enableScrollX) {
-        radian = radian || Math.atan2(distanceY, distanceX);
-        if (radian > Math.PI / 4) {
-          self.__enableScrollX = false;
-        }
-      }
+      self.__enableScrollX = self.options.scrollingX;
+      self.__enableScrollY = self.options.scrollingY;
 
       positions.push(self.__scrollLeft, self.__scrollTop, timeStamp);
 
